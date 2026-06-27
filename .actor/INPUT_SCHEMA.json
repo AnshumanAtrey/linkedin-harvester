@@ -22,7 +22,7 @@
     "aiMode": {
       "title": "AI assistance",
       "type": "string",
-      "description": "How much the AI is used. The tool is always deterministic first (real-name lookup + classic name matching); this only decides when, if ever, it calls an LLM. No AI: fastest and free, only clear matches resolve, anything uncertain is left unscored. Balanced (recommended): the AI steps in only when the deterministic score is uncertain. Full AI: the AI judges everything, highest match rate but highest cost and slowest.",
+      "description": "How much the AI is used. No AI: fastest and free, only the clear matches resolve, anything uncertain is left unscored. Balanced (recommended): the AI steps in only on the uncertain matches. Full AI: the AI works on every email, highest match rate but highest cost and slowest.",
       "editor": "select",
       "default": "balanced",
       "enum": ["regex", "balanced", "full"],
@@ -44,14 +44,14 @@
     "deepEnrich": {
       "title": "Find the name from public profiles (slower)",
       "type": "boolean",
-      "description": "When the email itself has no usable name (developers, or addresses like anshumanatrey@gmail.com), also look up GitHub, Gravatar and social handles to recover it. Catches more people but adds a few seconds per email. Off by default: most work emails (first.last@company.com) resolve from the address and company alone.",
+      "description": "When the email itself has no usable name (e.g. addresses like coolguy@gmail.com), also check the person's public professional footprint to recover one. Catches more people but adds a few seconds per email. Off by default: most work emails (first.last@company.com) resolve from the address and company alone.",
       "editor": "checkbox",
       "default": false
     },
     "scrapeProfiles": {
       "title": "Scrape the matched profile",
       "type": "boolean",
-      "description": "After a confident match, fetch the full LinkedIn profile and build a persona. Needs a Bright Data key below. Off by default, so the actor just returns the profile URL and confidence (no scraping, no extra cost).",
+      "description": "After a confident match, also fetch the full LinkedIn profile details. Needs a Bright Data key below. Off by default, so the actor just returns the profile URL and confidence (no scraping, no extra cost).",
       "editor": "checkbox",
       "default": false
     },
@@ -77,7 +77,7 @@
     "braveApiKey": {
       "title": "Brave Search API key",
       "type": "string",
-      "description": "Your Brave Search key. Powers the search step that finds candidate LinkedIn profiles. Without any search key the actor still uses the free signals (GitHub, Gravatar, handles).",
+      "description": "Your Brave Search key. Powers the web search that finds candidate LinkedIn profiles. Without a search key the actor still resolves what it can from the email's public footprint alone.",
       "editor": "textfield",
       "isSecret": true,
       "nullable": true

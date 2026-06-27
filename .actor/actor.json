@@ -2,7 +2,7 @@
   "actorSpecification": 1,
   "name": "linkedin-harvester",
   "title": "LinkedIn Profile Finder - Email to LinkedIn URL Lookup",
-  "description": "Find a LinkedIn profile from an email. Gathers public signals (GitHub, Gravatar, handles) plus search, no cookies or login. Pick No-AI, Balanced, or Full-AI. Returns a ranked URL with a confidence score.",
+  "description": "Turn an email address into the person's public LinkedIn profile, with a confidence score on every match. Paste one email or a list and get back clean LinkedIn URLs for your CRM, sales, or recruiting pipeline. No LinkedIn login or cookies. Pay only for confident matches.",
   "version": "0.1",
   "buildTag": "latest",
   "input": "./INPUT_SCHEMA.json",
@@ -40,5 +40,5 @@
   "maxMemoryMbytes": 2048,
   "categories": ["LEAD_GENERATION", "DEVELOPER_TOOLS", "SOCIAL_MEDIA"],
   "seoTitle": "LinkedIn Profile Finder - Email to LinkedIn URL Lookup",
-  "seoDescription": "Find a LinkedIn profile from an email address. Public signal enrichment plus search, no cookies or login. Choose no-AI, balanced, or full-AI. Bulk email to LinkedIn."
+  "seoDescription": "Find a LinkedIn profile from an email address. Bulk email-to-LinkedIn lookup with a confidence score on every match. No LinkedIn login or cookies, pay per result. For sales, recruiting, and CRM enrichment."
 }
