@@ -1,0 +1,20 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "LinkedIn Harvester Output",
+  "description": "One record per email: best-match LinkedIn URL, confidence, the deterministic signal bag, and the flow used.",
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "string",
+      "title": "Results (dataset)",
+      "description": "Email to LinkedIn results, one row per email.",
+      "template": "{{links.apiDefaultDatasetUrl}}/items"
+    },
+    "log": {
+      "type": "string",
+      "title": "Run Log",
+      "description": "Full execution log.",
+      "template": "{{links.publicRunUrl}}/log"
+    }
+  }
+}

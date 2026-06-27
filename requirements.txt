@@ -1,0 +1,22 @@
+# Core pipeline runs on the Python stdlib alone (sqlite3, re, difflib, json).
+# The packages below activate optional capabilities and the Apify actor wrapper.
+
+# Apify SDK (actor runtime). apify<3.0 pulls crawlee 0.6.x which breaks on
+# pydantic>=2.11 and browserforge>=1.2.4, so both are pinned (apify-manager rule).
+apify<3.0
+pydantic<2.11
+browserforge<1.2.4
+
+# HTTP. requests = sync resolvers/adapters; httpx = async ENRICH scanners.
+requests>=2.31.0
+httpx[http2]>=0.27
+
+# AI brains. openai = Groq (OpenAI-compatible) ; google-genai = Gemini fallback.
+openai>=1.40.0
+google-genai>=1.0.0
+
+# Nicer fuzzy matching for the heuristic scorer (falls back to stdlib difflib if absent).
+rapidfuzz>=3.6.0
+
+# Output to Google Sheets (optional - CSV export always works).
+gspread>=6.0.0

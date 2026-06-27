@@ -1,0 +1,118 @@
+{
+  "title": "LinkedIn Harvester Input",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "email": {
+      "title": "Email address",
+      "type": "string",
+      "description": "A single email address to look up. For a quick one-off. To process many at once, use the Emails list below instead.",
+      "editor": "textfield",
+      "example": "anshumanatrey@gmail.com",
+      "nullable": true
+    },
+    "emails": {
+      "title": "Emails (bulk)",
+      "type": "array",
+      "description": "A list of email addresses. Each one becomes one result row with its best-match LinkedIn profile and a confidence score. Role mailboxes like info@ or support@ are skipped automatically.",
+      "editor": "stringList",
+      "example": ["anshumanatrey@gmail.com", "jane.doe@stripe.com"],
+      "nullable": true
+    },
+    "aiMode": {
+      "title": "AI assistance",
+      "type": "string",
+      "description": "How much the AI is used. The tool is always deterministic first (real-name lookup + classic name matching); this only decides when, if ever, it calls an LLM. No AI: fastest and free, only clear matches resolve, anything uncertain is left unscored. Balanced (recommended): the AI steps in only when the deterministic score is uncertain. Full AI: the AI judges everything, highest match rate but highest cost and slowest.",
+      "editor": "select",
+      "default": "balanced",
+      "enum": ["regex", "balanced", "full"],
+      "enumTitles": [
+        "No AI  -  fastest, free, deterministic",
+        "Balanced  -  AI only when unsure (recommended)",
+        "Full AI  -  AI on everything, highest match rate"
+      ]
+    },
+    "minConfidencePct": {
+      "title": "Minimum confidence to scrape (%)",
+      "type": "integer",
+      "description": "Only profiles the tool is at least this confident about are accepted (and scraped, if scraping is on). Lower means more coverage but more wrong matches. 80 is a safe default.",
+      "editor": "number",
+      "default": 80,
+      "minimum": 40,
+      "maximum": 100
+    },
+    "deepEnrich": {
+      "title": "Find the name from public profiles (slower)",
+      "type": "boolean",
+      "description": "When the email itself has no usable name (developers, or addresses like anshumanatrey@gmail.com), also look up GitHub, Gravatar and social handles to recover it. Catches more people but adds a few seconds per email. Off by default: most work emails (first.last@company.com) resolve from the address and company alone.",
+      "editor": "checkbox",
+      "default": false
+    },
+    "scrapeProfiles": {
+      "title": "Scrape the matched profile",
+      "type": "boolean",
+      "description": "After a confident match, fetch the full LinkedIn profile and build a persona. Needs a Bright Data key below. Off by default, so the actor just returns the profile URL and confidence (no scraping, no extra cost).",
+      "editor": "checkbox",
+      "default": false
+    },
+    "runMode": {
+      "title": "Run mode",
+      "type": "string",
+      "description": "Incremental uses only free resolvers (default, runs forever at near-zero cost). Backfill also allows the paid hosted email-to-LinkedIn vendor for a one-time history sweep (needs a Findymail key).",
+      "editor": "select",
+      "default": "incremental",
+      "enum": ["incremental", "backfill"],
+      "enumTitles": ["Incremental  -  free resolvers only (default)", "Backfill  -  also allow paid hosted lookup"]
+    },
+    "groqApiKey": {
+      "title": "Groq API key",
+      "type": "string",
+      "description": "Your Groq key (starts with gsk_), free tier is generous. Powers the AI steps. Only needed if AI assistance is Balanced or Full. Get one at console.groq.com/keys.",
+      "editor": "textfield",
+      "isSecret": true,
+      "nullable": true,
+      "sectionCaption": "Keys (bring your own)",
+      "sectionDescription": "All optional. Add only the keys for the features you want. Nothing here is stored beyond the run."
+    },
+    "braveApiKey": {
+      "title": "Brave Search API key",
+      "type": "string",
+      "description": "Your Brave Search key. Powers the search step that finds candidate LinkedIn profiles. Without any search key the actor still uses the free signals (GitHub, Gravatar, handles).",
+      "editor": "textfield",
+      "isSecret": true,
+      "nullable": true
+    },
+    "googleCseKey": {
+      "title": "Google Custom Search key",
+      "type": "string",
+      "description": "Alternative to Brave for the search step. Only works with a legacy Custom Search key (Google closed new sign-ups). Provide together with the CX id below.",
+      "editor": "textfield",
+      "isSecret": true,
+      "nullable": true
+    },
+    "googleCseCx": {
+      "title": "Google Custom Search CX id",
+      "type": "string",
+      "description": "The search engine id that pairs with the Google Custom Search key above.",
+      "editor": "textfield",
+      "nullable": true
+    },
+    "brightdataApiKey": {
+      "title": "Bright Data API key",
+      "type": "string",
+      "description": "Enables real LinkedIn profile scraping when 'Scrape the matched profile' is on. Without it, the actor resolves the URL but does not scrape.",
+      "editor": "textfield",
+      "isSecret": true,
+      "nullable": true
+    },
+    "findymailApiKey": {
+      "title": "Findymail API key",
+      "type": "string",
+      "description": "Optional paid email-to-LinkedIn fallback, used only in Backfill run mode for emails the free resolvers miss.",
+      "editor": "textfield",
+      "isSecret": true,
+      "nullable": true
+    }
+  },
+  "required": []
+}

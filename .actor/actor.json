@@ -1,0 +1,44 @@
+{
+  "actorSpecification": 1,
+  "name": "linkedin-harvester",
+  "title": "LinkedIn Profile Finder - Email to LinkedIn URL Lookup",
+  "description": "Find a LinkedIn profile from an email. Gathers public signals (GitHub, Gravatar, handles) plus search, no cookies or login. Pick No-AI, Balanced, or Full-AI. Returns a ranked URL with a confidence score.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "input": "./INPUT_SCHEMA.json",
+  "output": "./output_schema.json",
+  "dockerfile": "../Dockerfile",
+  "readme": "../README.md",
+  "storages": {
+    "dataset": {
+      "actorSpecification": 1,
+      "title": "LinkedIn Harvester Results",
+      "views": {
+        "overview": {
+          "title": "Email to LinkedIn",
+          "description": "One row per email: best-match profile, confidence, and how the name was found.",
+          "transformation": {
+            "fields": ["email", "found", "linkedin_url", "confidence", "passes_gate", "derived_name", "name_source"]
+          },
+          "display": {
+            "component": "table",
+            "properties": {
+              "email": {"label": "Email"},
+              "found": {"label": "Found"},
+              "linkedin_url": {"label": "LinkedIn URL"},
+              "confidence": {"label": "Confidence"},
+              "passes_gate": {"label": "Confident"},
+              "derived_name": {"label": "Name"},
+              "name_source": {"label": "Name from"}
+            }
+          }
+        }
+      }
+    }
+  },
+  "minMemoryMbytes": 512,
+  "maxMemoryMbytes": 2048,
+  "categories": ["LEAD_GENERATION", "DEVELOPER_TOOLS", "SOCIAL_MEDIA"],
+  "seoTitle": "LinkedIn Profile Finder - Email to LinkedIn URL Lookup",
+  "seoDescription": "Find a LinkedIn profile from an email address. Public signal enrichment plus search, no cookies or login. Choose no-AI, balanced, or full-AI. Bulk email to LinkedIn."
+}

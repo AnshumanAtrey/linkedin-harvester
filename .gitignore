@@ -1,0 +1,18 @@
+# Secrets - never commit real keys
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# Local state
+*.db
+out/
+storage/
+apify_storage/
+.DS_Store
+*.log
