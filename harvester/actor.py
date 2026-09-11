@@ -66,22 +66,50 @@ async def main() -> None:
 
         emails = _collect_emails(inp)
         if not emails:
-            raise ValueError("Provide at least one email (field 'email' or 'emails').")
+            # A clean, explained failure instead of a stack trace. The daily Store
+            # test uses the prefilled input, so it never lands here.
+            await Actor.fail(status_message=(
+                "No email given. Enter at least one address in 'Email address' or "
+                "'Emails (bulk)', e.g. jane.doe@stripe.com."))
+            return
 
         await _charge("actor_start")
         Actor.log.info(f"flow={inp.get('aiMode', 'balanced')} gate={gate} "
                        f"deep_enrich={deep} emails={len(emails)}")
 
+        found = confident = failed = 0
         for email in emails:
             await _charge("email_processed")
-            result = find_linkedin(email, mode=mode, do_enrich=deep, flow=flow)
+            try:
+                result = find_linkedin(email, mode=mode, do_enrich=deep, flow=flow)
+            except Exception as exc:  # noqa: BLE001 - one bad address must not kill the batch
+                Actor.log.warning(f"{email} -> lookup failed: {exc}")
+                failed += 1
+                result = {"email": email, "found": False, "linkedin_url": None,
+                          "confidence": 0.0, "passes_gate": False, "error": str(exc)}
             if result.get("passes_gate"):
                 await _charge("profile_found")
+                confident += 1
+            if result.get("found"):
+                found += 1
             await Actor.push_data(result)
             Actor.log.info(
                 f"{email} -> {result.get('linkedin_url')} "
                 f"(conf {result.get('confidence')}, {result.get('source')})"
             )
+
+        # Say plainly what happened so an empty or weak result never looks like a broken run.
+        total = len(emails)
+        if found == 0:
+            msg = (f"Checked {total} email(s); no LinkedIn profile found. Work emails "
+                   f"(first.last@company.com) resolve best; add a Brave Search key for wider coverage.")
+        else:
+            msg = (f"Checked {total} email(s): {found} profile(s) found, "
+                   f"{confident} above the {int(gate * 100)}% confidence gate.")
+        if failed:
+            msg += f" {failed} lookup(s) errored and were returned with found=false."
+        await Actor.set_status_message(msg)
+        Actor.log.info(msg)
 
 
 if __name__ == "__main__":

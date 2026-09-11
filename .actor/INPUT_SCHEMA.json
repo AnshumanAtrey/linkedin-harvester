@@ -14,9 +14,10 @@
     "emails": {
       "title": "Emails (bulk)",
       "type": "array",
-      "description": "A list of email addresses. Each one becomes one result row with its best-match LinkedIn profile and a confidence score. Role mailboxes like info@ or support@ are skipped automatically.",
+      "description": "A list of email addresses. Each one becomes one result row with its best-match LinkedIn profile and a confidence score. Role mailboxes like info@ or support@ are skipped automatically. The two prefilled addresses are a live demo: one resolves with high confidence, one as a possible match. Replace them with your own.",
       "editor": "stringList",
       "example": ["anshumanatrey@gmail.com", "jane.doe@stripe.com"],
+      "prefill": ["anshumanatrey@gmail.com", "satya.nadella@microsoft.com"],
       "nullable": true
     },
     "aiMode": {
