@@ -62,7 +62,10 @@ async def main() -> None:
                     escalate_only=preset.escalate_only, gate=gate)
 
         mode = inp.get("runMode", "incremental")
-        deep = bool(inp.get("deepEnrich", False))
+        # Public-profile enrichment (GitHub, Gravatar, PGP, handle probes) is the
+        # only resolver that works without a search key, so it is on by default.
+        # It was off, which silently disabled every key-less lookup on the platform.
+        deep = bool(inp.get("deepEnrich", True))
 
         emails = _collect_emails(inp)
         if not emails:

@@ -43,11 +43,11 @@
       "maximum": 100
     },
     "deepEnrich": {
-      "title": "Find the name from public profiles (slower)",
+      "title": "Check public profiles (recommended)",
       "type": "boolean",
-      "description": "When the email itself has no usable name (e.g. addresses like coolguy@gmail.com), also check the person's public professional footprint to recover one. Catches more people but adds a few seconds per email. Off by default: most work emails (first.last@company.com) resolve from the address and company alone.",
+      "description": "Looks the address up across public developer and social profiles (GitHub, Gravatar, PGP keyservers, handle probes on 8 platforms) to recover the person's name and a handle that is consistent across sites. That handle is what resolves a LinkedIn URL when no search key is given. Adds about 5 to 10 seconds per email. Turn it off only for speed when you supply a Brave Search key.",
       "editor": "checkbox",
-      "default": false
+      "default": true
     },
     "scrapeProfiles": {
       "title": "Scrape the matched profile",
