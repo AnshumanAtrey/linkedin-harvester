@@ -1,0 +1,51 @@
+{
+  "$comment": "Store listing fields that apify push never sends. Applied by scripts/store-metadata.mjs after every deploy. Title, description and categories live in actor.json.",
+  "seoTitle": "LinkedIn Profile Finder - Email to LinkedIn URL Lookup",
+  "seoDescription": "Find a LinkedIn profile from an email address. Bulk email to LinkedIn lookup with a confidence score on every match. No LinkedIn login or cookies, pay per result. For sales, recruiting and CRM.",
+  "exampleRunInput": {
+    "emails": [
+      "anshumanatrey@gmail.com",
+      "satya.nadella@microsoft.com"
+    ],
+    "aiMode": "balanced"
+  },
+  "actorPermissionLevel": "LIMITED_PERMISSIONS",
+  "isPublic$comment": "Un-deprecated 2026-09-12 after the prefill fix (builds 0.1.4 and 0.1.5). Apify refuses to unpublish a paid Actor (cannot-unpublish-paid-actor), so false here would fail the CI step until monetization is cancelled in Console.",
+  "isPublic": true,
+  "defaultRunOptions$comment": "Measured 2026-09-12 on 6 emails: 4 GB 25.3 s / 0.014 CU, 1 GB 25.0 s / 0.0069 CU, peak RSS under 100 MB. 1 GB halves compute at the same speed. actor.json caps memory at 2 GB.",
+  "defaultRunOptions": {
+    "build": "latest",
+    "memoryMbytes": 1024,
+    "timeoutSecs": 3600
+  },
+  "pricing": {
+    "apply": true,
+    "$comment": "Applied 2026-09-12 via API (an increase; the CI script refuses increases by design and only reconciles decreases). Market check the same day: email to LinkedIn actors on the Store charge $0.01 to $0.025 per resolved profile. Compute at 1 GB is about $0.0002 per email, so the per-email fee is value pricing, not cost recovery. Event names must match the Actor.charge() calls in harvester/actor.py.",
+    "pricingInfos": [
+      {
+        "pricingModel": "PAY_PER_EVENT",
+        "apifyMarginPercentage": 0.2,
+        "reasonForChange": "Repriced with v0.1.5, which fixed key-less lookups on the platform. Start fee covers the run, per-email fee covers the public-profile checks, and only matches above your confidence gate carry the result fee. Default memory cut 4 GB to 1 GB.",
+        "pricingPerEvent": {
+          "actorChargeEvents": {
+            "actor_start": {
+              "eventTitle": "Run start",
+              "eventDescription": "Charged once per run. Covers container start and batch setup.",
+              "eventPriceUsd": 0.01
+            },
+            "email_processed": {
+              "eventTitle": "Email checked",
+              "eventDescription": "Charged once per email looked up, found or not. Covers the public-profile checks (GitHub, Gravatar, PGP keyservers, handle probes on 8 platforms) that recover the name and handle.",
+              "eventPriceUsd": 0.005
+            },
+            "profile_found": {
+              "eventTitle": "Confident match",
+              "eventDescription": "Charged only when a LinkedIn URL clears your confidence gate (80% by default). Possible matches below the gate are returned free, with their score.",
+              "eventPriceUsd": 0.02
+            }
+          }
+        }
+      }
+    ]
+  }
+}

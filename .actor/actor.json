@@ -18,18 +18,40 @@
           "title": "Email to LinkedIn",
           "description": "One row per email: best-match profile, confidence, and how the name was found.",
           "transformation": {
-            "fields": ["email", "found", "linkedin_url", "confidence", "passes_gate", "derived_name", "name_source"]
+            "fields": [
+              "email",
+              "found",
+              "linkedin_url",
+              "confidence",
+              "passes_gate",
+              "derived_name",
+              "name_source"
+            ]
           },
           "display": {
             "component": "table",
             "properties": {
-              "email": {"label": "Email"},
-              "found": {"label": "Found"},
-              "linkedin_url": {"label": "LinkedIn URL"},
-              "confidence": {"label": "Confidence"},
-              "passes_gate": {"label": "Confident"},
-              "derived_name": {"label": "Name"},
-              "name_source": {"label": "Name from"}
+              "email": {
+                "label": "Email"
+              },
+              "found": {
+                "label": "Found"
+              },
+              "linkedin_url": {
+                "label": "LinkedIn URL"
+              },
+              "confidence": {
+                "label": "Confidence"
+              },
+              "passes_gate": {
+                "label": "Confident"
+              },
+              "derived_name": {
+                "label": "Name"
+              },
+              "name_source": {
+                "label": "Name from"
+              }
             }
           }
         }
@@ -38,7 +60,9 @@
   },
   "minMemoryMbytes": 512,
   "maxMemoryMbytes": 2048,
-  "categories": ["LEAD_GENERATION", "DEVELOPER_TOOLS", "SOCIAL_MEDIA"],
-  "seoTitle": "LinkedIn Profile Finder - Email to LinkedIn URL Lookup",
-  "seoDescription": "Find a LinkedIn profile from an email address. Bulk email-to-LinkedIn lookup with a confidence score on every match. No LinkedIn login or cookies, pay per result. For sales, recruiting, and CRM enrichment."
+  "categories": [
+    "LEAD_GENERATION",
+    "DEVELOPER_TOOLS",
+    "SOCIAL_MEDIA"
+  ]
 }
