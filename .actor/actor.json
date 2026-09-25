@@ -3,7 +3,7 @@
   "name": "linkedin-harvester",
   "title": "LinkedIn Profile Finder - Email to LinkedIn URL Lookup",
   "description": "Turn an email address into the person's public LinkedIn profile, with a confidence score on every match. Paste one email or a list and get back clean LinkedIn URLs for your CRM, sales, or recruiting pipeline. No LinkedIn login or cookies. Pay only for confident matches.",
-  "version": "0.1",
+  "version": "0.2",
   "buildTag": "latest",
   "input": "./INPUT_SCHEMA.json",
   "output": "./output_schema.json",

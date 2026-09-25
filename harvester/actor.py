@@ -44,6 +44,22 @@ async def _charge(event: str) -> None:
         pass
 
 
+async def _set_status(message: str) -> None:
+    """Set the run's status message without ever failing a finished run.
+
+    The API stores the message BEFORE the SDK parses its response, and the SDK then
+    validates the run object against an origin enum that does not include Apify's
+    newer run origins (APIFY_AI — the platform's AI-assistant channel). That parse
+    raises, and it used to turn every assistant-started run into FAILED after all its
+    work was already done and pushed. Catching it keeps the message set and the run
+    green, and covers any future origin the bundled enum has not caught up with.
+    """
+    try:
+        await Actor.set_status_message(message)
+    except Exception as exc:  # noqa: BLE001
+        Actor.log.debug(f"status message stored but not confirmed by the SDK: {exc}")
+
+
 async def main() -> None:
     async with Actor:
         inp = await Actor.get_input() or {}
@@ -111,7 +127,7 @@ async def main() -> None:
                    f"{confident} above the {int(gate * 100)}% confidence gate.")
         if failed:
             msg += f" {failed} lookup(s) errored and were returned with found=false."
-        await Actor.set_status_message(msg)
+        await _set_status(msg)
         Actor.log.info(msg)
 
 
