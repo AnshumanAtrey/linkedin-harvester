@@ -73,11 +73,13 @@ async def main() -> None:
 
         emails = collect_emails(inp)
         if not emails:
-            # A clean, explained failure instead of a stack trace. The daily Store
-            # test uses the prefilled input, so it never lands here.
+            # A clean, explained failure instead of a stack trace. The Console form
+            # validates the address shape before the run (INPUT_SCHEMA patterns), so
+            # this mainly guards API/MCP callers; the message shows the right format.
             await Actor.fail(status_message=(
-                "No email given. Enter at least one address in 'Email address' or "
-                "'Emails (bulk)', e.g. jane.doe@stripe.com."))
+                "No valid email found in the input. Enter one email per row in "
+                "'Emails (bulk)', or several separated by commas, e.g. "
+                "jane.doe@stripe.com, john@acme.com."))
             return
 
         await _charge("actor_start")
