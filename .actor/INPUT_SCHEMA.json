@@ -28,6 +28,7 @@
         "pattern": "^\\s*([A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}(\\s*,\\s*[A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,})*)?\\s*$"
       },
       "errorMessage": {
+        "items": "Each row must be an email like jane.doe@stripe.com. Put one address per row, or separate several with commas (a@company.com, b@company.com).",
         "pattern": "Each row must be an email like jane.doe@stripe.com. Put one address per row, or separate several with commas (a@company.com, b@company.com)."
       },
       "nullable": true
