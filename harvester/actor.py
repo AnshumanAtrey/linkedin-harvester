@@ -11,6 +11,8 @@ import os
 
 from apify import Actor
 
+from harvester.inputs import collect_emails, confidence_gate
+
 # Input field -> environment variable the resolvers/AI read at call time.
 _KEY_MAP = {
     "groqApiKey": "GROQ_API_KEY",
@@ -20,20 +22,6 @@ _KEY_MAP = {
     "brightdataApiKey": "BRIGHTDATA_API_KEY",
     "findymailApiKey": "FINDYMAIL_API_KEY",
 }
-
-
-def _collect_emails(inp: dict) -> list[str]:
-    raw = []
-    if inp.get("email"):
-        raw.append(inp["email"])
-    raw += inp.get("emails") or []
-    seen, clean = set(), []
-    for e in raw:
-        e = (e or "").strip().lower()
-        if e and "@" in e and e not in seen:
-            seen.add(e)
-            clean.append(e)
-    return clean
 
 
 async def _charge(event: str) -> None:
@@ -73,7 +61,7 @@ async def main() -> None:
         from harvester.flow import PRESETS, BALANCED, Flow
 
         preset = PRESETS.get(inp.get("aiMode", "balanced"), BALANCED)
-        gate = max(0.0, min(1.0, (inp.get("minConfidencePct") or 80) / 100.0))
+        gate = confidence_gate(inp.get("minConfidencePct"))
         flow = Flow(ai_extract=preset.ai_extract, ai_score=preset.ai_score,
                     escalate_only=preset.escalate_only, gate=gate)
 
@@ -83,7 +71,7 @@ async def main() -> None:
         # It was off, which silently disabled every key-less lookup on the platform.
         deep = bool(inp.get("deepEnrich", True))
 
-        emails = _collect_emails(inp)
+        emails = collect_emails(inp)
         if not emails:
             # A clean, explained failure instead of a stack trace. The daily Store
             # test uses the prefilled input, so it never lands here.
