@@ -32,6 +32,34 @@ async def _charge(event: str) -> None:
         pass
 
 
+def _usd(amount) -> str:
+    """A limit or a price as people read it: $0.025, $0.5, $5."""
+    return "$" + (f"{float(amount):.4f}".rstrip("0").rstrip(".") or "0")
+
+
+class _Budget:
+    """The run's spending limit, which Apify says a run must stop at.
+
+    An email is looked up only while the limit can pay its worst case, the email
+    fee plus a confident match. Before this, a confident match past the limit was
+    delivered free (2026-10-29, run KzQzfHUahiQH5VpMt: limit $0.03, match
+    delivered, profile_found charged 0).
+    """
+
+    def __init__(self) -> None:
+        self.cm = Actor.get_charging_manager()
+        info = self.cm.get_pricing_info()
+        self.ppe = info.is_pay_per_event
+        self.limit = info.max_total_charge_usd
+        self.prices = info.per_event_prices
+
+    def cost(self, *events: str):
+        return sum(self.prices.get(event, 0) for event in events)
+
+    def can_pay(self, *events: str) -> bool:
+        return not self.ppe or self.limit - self.cm.calculate_total_charged_amount() >= self.cost(*events)
+
+
 async def _set_status(message: str) -> None:
     """Set the run's status message without ever failing a finished run.
 
@@ -82,12 +110,28 @@ async def main() -> None:
                 "jane.doe@stripe.com, john@acme.com."))
             return
 
+        budget = _Budget()
+        if not budget.can_pay("actor_start", "email_processed", "profile_found"):
+            msg = (f"Nothing was looked up and nothing was charged: this run's spending limit of "
+                   f"{_usd(budget.limit)} cannot pay for one email "
+                   f"({_usd(budget.cost('actor_start', 'email_processed', 'profile_found'))} with the run start "
+                   "and a confident match). Raise the run's maximum cost in the run options, or add credit, "
+                   "then run it again.")
+            Actor.log.warning(msg)
+            await _set_status(msg)
+            return
+
         await _charge("actor_start")
         Actor.log.info(f"flow={inp.get('aiMode', 'balanced')} gate={gate} "
                        f"deep_enrich={deep} emails={len(emails)}")
 
-        found = confident = failed = 0
+        found = confident = failed = checked = 0
+        stopped = False
         for email in emails:
+            if not budget.can_pay("email_processed", "profile_found"):
+                stopped = True
+                break
+            checked += 1
             await _charge("email_processed")
             try:
                 result = find_linkedin(email, mode=mode, do_enrich=deep, flow=flow)
@@ -96,19 +140,21 @@ async def main() -> None:
                 failed += 1
                 result = {"email": email, "found": False, "linkedin_url": None,
                           "confidence": 0.0, "passes_gate": False, "error": str(exc)}
-            if result.get("passes_gate"):
-                await _charge("profile_found")
-                confident += 1
             if result.get("found"):
                 found += 1
-            await Actor.push_data(result)
+            if result.get("passes_gate"):
+                # Charged after the row is saved; the limit check above keeps room for it.
+                await Actor.push_data(result, charged_event_name="profile_found")
+                confident += 1
+            else:
+                await Actor.push_data(result)
             Actor.log.info(
                 f"{email} -> {result.get('linkedin_url')} "
                 f"(conf {result.get('confidence')}, {result.get('source')})"
             )
 
         # Say plainly what happened so an empty or weak result never looks like a broken run.
-        total = len(emails)
+        total = checked
         if found == 0:
             msg = (f"Checked {total} email(s); no LinkedIn profile found. Work emails "
                    f"(first.last@company.com) resolve best; add a Brave Search key for wider coverage.")
@@ -117,6 +163,9 @@ async def main() -> None:
                    f"{confident} above the {int(gate * 100)}% confidence gate.")
         if failed:
             msg += f" {failed} lookup(s) errored and were returned with found=false."
+        if stopped:
+            msg += (f" Stopped early after {checked} of {len(emails)} email(s): this run's spending limit of "
+                    f"{_usd(budget.limit)} was reached. Raise the run's maximum cost to check the rest.")
         await _set_status(msg)
         Actor.log.info(msg)
 
