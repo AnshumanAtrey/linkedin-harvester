@@ -1,0 +1,109 @@
+# LinkedIn Profile Finder - Email to LinkedIn URL Lookup
+
+> Turn an email address into the person's public LinkedIn profile, with a confidence score on every match.
+
+## Summary
+
+LinkedIn Profile Finder is an Apify actor that resolves an email address to the person's public LinkedIn profile URL and scores every match from 0 to 100%. Each match is rebuilt from public evidence on every run: the name in the address, GitHub commit authors, Gravatar, PGP keyservers and handle probes on 8 platforms. It never logs into LinkedIn, uses no cookies, and has no data broker or purchased database behind it. The input is one email or a list; the output is one row per email with the URL, the confidence, the name and where it came from, and the evidence.
+
+Store: https://apify.com/anshumanatrey/linkedin-harvester
+Source: https://github.com/AnshumanAtrey/linkedin-harvester
+
+## Key features
+
+- Email in, best-match LinkedIn URL out, with a 0 to 100% confidence score on every row.
+- Every row shows its evidence: where the name came from (the address, a GitHub commit, Gravatar) and on how many platforms the handle was confirmed.
+- A miss is a clean miss: role mailboxes (info@, support@, sales@) are skipped, and an address with no candidate returns found: false instead of a confident guess.
+- Possible matches, between 50% and your gate, come back with their score and no match fee, for you to verify.
+- Bulk or one-off: a single address or thousands, one result row each.
+- Works with no API keys; free Brave Search and Groq keys widen coverage.
+
+## Input keys
+
+- Email address (email): a single address for a quick one-off.
+- Emails (bulk) (emails): one email per row, or several separated by commas.
+- AI assistance (aiMode): regex (no AI, clear matches only), balanced (the default, AI only on uncertain matches) or full (AI on every email, needs a Groq key).
+- Minimum confidence to scrape (%) (minConfidencePct): the confidence gate, 80 by default.
+- Check public profiles (recommended) (deepEnrich): on by default; GitHub, Gravatar, PGP keyservers and 8 platforms' handles.
+- Scrape the matched profile (scrapeProfiles): off by default; fetches the full profile after a confident match and needs a Bright Data key.
+- Run mode (runMode): incremental (the default, free resolvers only) or backfill (adds the paid Findymail fallback for misses).
+- Optional keys: Groq API key (groqApiKey), Brave Search API key (braveApiKey), Google Custom Search key (googleCseKey) and CX id (googleCseCx), Bright Data API key (brightdataApiKey), Findymail API key (findymailApiKey).
+
+## Pricing
+
+PAY_PER_EVENT model, platform compute included:
+
+- Run start: $0.01, once per run
+- Email checked: $0.005 per email, found or not
+- Confident match: $0.02, only when a URL clears your confidence gate (80% by default)
+
+On paid Apify plans the email and match fees are 10% less on Scale ($0.0045 and $0.018) and 20% less on Business and above ($0.004 and $0.016). The run start fee is the same on every plan.
+
+Typical costs (Free and Starter price):
+
+- 1 email, confident match: $0.035
+- 100 emails, 30 confident matches: $1.11
+- 1,000 emails, 250 confident matches: $10.01
+
+A run stops at its spending limit: an email is looked up only while the limit can still pay for it and a confident match.
+
+## When to use
+
+- Enrich inbound leads and sign-ups with the right LinkedIn profile before outreach.
+- Turn a list of candidate emails into LinkedIn profiles for recruiting.
+- Clean, verify and backfill CRM contact records at scale.
+- Find out who emailed you.
+- An email to LinkedIn API or lead enrichment step from the Apify API, Python, JavaScript, n8n, Make or an AI agent.
+
+## When NOT to use
+
+- The user needs the full LinkedIn profile without a Bright Data key: the URL is resolved from public evidence, not read from LinkedIn, which login-walls its pages.
+- The addresses are personal ones with no public developer or social footprint: those usually stay unresolved.
+- The list is role mailboxes (info@, support@, sales@): they are skipped by design.
+
+## Sample input
+
+```json
+{
+  "emails": ["anshumanatrey@gmail.com", "satya.nadella@microsoft.com"],
+  "aiMode": "balanced"
+}
+```
+
+## Sample output (one record)
+
+```json
+{
+  "email": "anshumanatrey@gmail.com",
+  "found": true,
+  "linkedin_url": "https://www.linkedin.com/in/anshumanatrey",
+  "confidence": 0.97,
+  "passes_gate": true,
+  "gate_threshold": 0.8,
+  "derived_name": "Anshuman Atrey",
+  "name_source": "github_commit",
+  "source": "handle_pivot",
+  "evidence": "handle 'anshumanatrey' confirmed on 4 platform(s) -> likely LinkedIn slug"
+}
+```
+
+## Differentiators vs alternatives
+
+- vs oday/mawsool-email-linkedin-lookup ($0.002 per email looked up): cheaper per email; this actor charges a match only above your confidence gate and shows the evidence behind it.
+- vs b2bsearch/email-to-linkedin ($0.0032 per profile found, misses free): cheaper per found profile; this actor returns possible matches with their score for free and skips role mailboxes.
+- vs data-broker enrichment: no purchased database; every match is rebuilt from public developer and social profiles on each run.
+
+## Documentation
+
+- Apify Store: https://apify.com/anshumanatrey/linkedin-harvester
+- GitHub repo: https://github.com/AnshumanAtrey/linkedin-harvester
+- Issues / feedback: GitHub Issues on the above repo
+- License: MIT
+
+## Maintainer
+
+Anshuman Atrey (https://github.com/AnshumanAtrey), who publishes a portfolio of OSINT actors on Apify Store. Feature requests and bugs: LinkedIn (https://linkedin.com/in/anshumanatrey, fastest), GitHub issues, or atrey.dev.
+
+## Last updated
+
+2026-10-30
