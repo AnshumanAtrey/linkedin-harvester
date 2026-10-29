@@ -1,11 +1,11 @@
 # Core pipeline runs on the Python stdlib alone (sqlite3, re, difflib, json).
 # The packages below activate optional capabilities and the Apify actor wrapper.
 
-# Apify SDK (actor runtime). apify<3.0 pulls crawlee 0.6.x which breaks on
-# pydantic>=2.11 and browserforge>=1.2.4, so both are pinned (apify-manager rule).
-apify<3.0
-pydantic<2.11
-browserforge<1.2.4
+# Apify SDK 4 (actor runtime). SDK 2.x failed every run started by an AI agent
+# through Apify's MCP server (run origin MCP, run javg8GKbQgftC7WLV, 2026-10-29)
+# before any work. SDK 4 needs Python 3.11+ and pydantic>=2.11, so the old crawlee
+# 0.6 pins are gone. Capped below 5 so a rebuild cannot pull the next major.
+apify>=4.1,<5
 
 # HTTP. requests = sync resolvers/adapters; httpx = async ENRICH scanners.
 requests>=2.31.0
