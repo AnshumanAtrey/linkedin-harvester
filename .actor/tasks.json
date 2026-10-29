@@ -1,0 +1,36 @@
+{
+  "$comment": "Example tasks published on the Store by scripts/publish-tasks.mjs after every deploy (CI only). Each one is a search people type, with its own Google-indexed landing page and .md (manager/rules/SEO.md). Presets are the maintainer's own address and public figures' published work addresses, never a private person's.",
+  "options": {
+    "build": "latest",
+    "memoryMbytes": 1024,
+    "timeoutSecs": 3600
+  },
+  "tasks": [
+    {
+      "name": "email-to-linkedin-profile",
+      "title": "Email to LinkedIn: find the LinkedIn profile behind an email",
+      "description": "Look up an email address and get the best-match public LinkedIn profile URL with a 0 to 100% confidence score and the evidence behind it: where the name came from and on how many platforms the handle was confirmed. No LinkedIn login or cookies. Replace the example with the address you are checking.",
+      "input": {
+        "emails": ["anshumanatrey@gmail.com"],
+        "aiMode": "balanced"
+      },
+      "seoTitle": "Email to LinkedIn - Find a LinkedIn Profile by Email",
+      "seoDescription": "Find the public LinkedIn profile behind an email, with a confidence score and the evidence for it. No LinkedIn login or cookies. Bulk-ready.",
+      "inputSchemaFields": ["emails", "aiMode", "minConfidencePct"],
+      "datasetView": "overview"
+    },
+    {
+      "name": "bulk-email-to-linkedin-lookup",
+      "title": "Bulk email to LinkedIn lookup for a lead or candidate list",
+      "description": "Paste a list of work emails and get one row per address with its LinkedIn profile URL, confidence score and evidence, ready for a CRM, outreach or recruiting pipeline. Role mailboxes are skipped, possible matches below your gate cost nothing extra. Add a free Brave Search key to confirm more matches.",
+      "input": {
+        "emails": ["satya.nadella@microsoft.com", "jensen.huang@nvidia.com", "tim.cook@apple.com"],
+        "aiMode": "balanced"
+      },
+      "seoTitle": "Bulk Email to LinkedIn Lookup - Lead Enrichment",
+      "seoDescription": "One row per work email with its LinkedIn URL, confidence and evidence, for CRM enrichment, outreach or recruiting. Role mailboxes skipped.",
+      "inputSchemaFields": ["emails", "minConfidencePct", "braveApiKey", "aiMode"],
+      "datasetView": "overview"
+    }
+  ]
+}
