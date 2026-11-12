@@ -4,6 +4,13 @@ Turn an email address into the person's public LinkedIn profile, with a confiden
 
 Use it as a reverse email lookup, an email to LinkedIn API or a lead enrichment step from the Apify Console, the Apify API, Python, JavaScript, n8n, Make or an AI agent, and export the rows as JSON, CSV or Excel. Available as an [Apify Actor](https://apify.com/anshumanatrey/linkedin-harvester). $0.005 per email checked plus $0.02 per confident match. Works with no API keys; free Brave Search and Groq keys widen coverage.
 
+**Use it from an AI assistant:**
+
+- **Claude** (claude.ai and the desktop app): [Add LinkedIn Profile Finder to Claude](https://claude.ai/customize/connectors?modal=add-custom-connector&connectorName=LinkedIn%20Profile%20Finder&connectorUrl=https%3A%2F%2Fmcp.apify.com%3Ftools%3Danshumanatrey%2Flinkedin-harvester), click Continue, sign in to Apify, Allow, and ask in plain words.
+- **Claude Code:** `claude mcp add --transport http linkedin-harvester "https://mcp.apify.com?tools=anshumanatrey/linkedin-harvester"`, then run `/mcp` to sign in to Apify.
+- **Codex:** `codex mcp add linkedin-harvester --url "https://mcp.apify.com?tools=anshumanatrey/linkedin-harvester"`, then `codex mcp login linkedin-harvester`.
+- **Any other MCP client:** `https://mcp.apify.com?tools=anshumanatrey/linkedin-harvester`, signed in with Apify or an `Authorization: Bearer <APIFY_TOKEN>` header.
+
 ## What does it do?
 
 - **Email in, best-match LinkedIn URL out**, with a 0 to 100% confidence score on every row so you know which matches to trust.
