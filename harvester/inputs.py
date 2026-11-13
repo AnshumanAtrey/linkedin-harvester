@@ -60,6 +60,11 @@ def collect_emails(inp: dict) -> list[str]:
     return clean
 
 
+def typed_nothing(inp: dict) -> bool:
+    """True when neither email field holds any text: no input, as opposed to text with no address in it."""
+    return not any(t.strip() for t in _texts(inp.get("email")) + _texts(inp.get("emails")))
+
+
 def confidence_gate(value, default: int = 80) -> float:
     """minConfidencePct (0..100) -> a 0..1 gate, tolerant of a string or junk.
 

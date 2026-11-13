@@ -11,7 +11,9 @@ import os
 
 from apify import Actor
 
-from harvester.inputs import collect_emails, confidence_gate
+from harvester.inputs import collect_emails, confidence_gate, typed_nothing
+
+EXAMPLE_EMAIL = "satya.nadella@microsoft.com"  # from the form's prefill: looked up free when no email is given
 
 # Input field -> environment variable the resolvers/AI read at call time.
 _KEY_MAP = {
@@ -100,6 +102,13 @@ async def main() -> None:
         deep = bool(inp.get("deepEnrich", True))
 
         emails = collect_emails(inp)
+        # No email typed at all (both fields are optional, and a blank row passes Apify's input check): look up the
+        # example instead of failing, free, so the run shows what it returns (owner, 2026-11-14). Text with no
+        # address in it still fails with the format below.
+        example = not emails and typed_nothing(inp)
+        if example:
+            emails = [EXAMPLE_EMAIL]
+            Actor.log.warning(f"No email given, so this run looks up the example {EXAMPLE_EMAIL}, free.")
         if not emails:
             # A clean, explained failure instead of a stack trace. The Console form
             # validates the address shape before the run (INPUT_SCHEMA patterns), so
@@ -111,7 +120,7 @@ async def main() -> None:
             return
 
         budget = _Budget()
-        if not budget.can_pay("actor_start", "email_processed", "profile_found"):
+        if not example and not budget.can_pay("actor_start", "email_processed", "profile_found"):
             msg = (f"Nothing was looked up and nothing was charged: this run's spending limit of "
                    f"{_usd(budget.limit)} cannot pay for one email "
                    f"({_usd(budget.cost('actor_start', 'email_processed', 'profile_found'))} with the run start "
@@ -121,18 +130,20 @@ async def main() -> None:
             await _set_status(msg)
             return
 
-        await _charge("actor_start")
+        if not example:
+            await _charge("actor_start")
         Actor.log.info(f"flow={inp.get('aiMode', 'balanced')} gate={gate} "
                        f"deep_enrich={deep} emails={len(emails)}")
 
         found = confident = failed = checked = 0
         stopped = False
         for email in emails:
-            if not budget.can_pay("email_processed", "profile_found"):
+            if not example and not budget.can_pay("email_processed", "profile_found"):
                 stopped = True
                 break
             checked += 1
-            await _charge("email_processed")
+            if not example:
+                await _charge("email_processed")
             try:
                 result = find_linkedin(email, mode=mode, do_enrich=deep, flow=flow)
             except Exception as exc:  # noqa: BLE001 - one bad address must not kill the batch
@@ -144,7 +155,7 @@ async def main() -> None:
                 found += 1
             if result.get("passes_gate"):
                 # Charged after the row is saved; the limit check above keeps room for it.
-                await Actor.push_data(result, charged_event_name="profile_found")
+                await Actor.push_data(result, charged_event_name=None if example else "profile_found")
                 confident += 1
             else:
                 await Actor.push_data(result)
@@ -166,6 +177,9 @@ async def main() -> None:
         if stopped:
             msg += (f" Stopped early after {checked} of {len(emails)} email(s): this run's spending limit of "
                     f"{_usd(budget.limit)} was reached. Raise the run's maximum cost to check the rest.")
+        if example:
+            msg = (f"No email was given, so this run looked up the example {EXAMPLE_EMAIL}, free of charge. {msg} "
+                   "Enter your own emails, one per row.")
         await _set_status(msg)
         Actor.log.info(msg)
 

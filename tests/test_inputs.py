@@ -12,7 +12,7 @@ import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from harvester.inputs import collect_emails, confidence_gate  # noqa: E402
+from harvester.inputs import collect_emails, confidence_gate, typed_nothing  # noqa: E402
 
 
 class CollectEmails(unittest.TestCase):
@@ -61,6 +61,15 @@ class ConfidenceGate(unittest.TestCase):
     def test_clamped(self):
         self.assertEqual(confidence_gate(999), 1.0)
         self.assertEqual(confidence_gate(-5), 0.0)
+
+
+class NothingTyped(unittest.TestCase):
+    def test_blank_or_missing_fields_are_no_input(self):
+        # No input runs the free example; typed text with no address in it still fails with the format.
+        for inp in ({}, {"emails": [""]}, {"emails": ["  "], "email": ""}, {"emails": None}):
+            self.assertTrue(typed_nothing(inp), inp)
+            self.assertEqual(collect_emails(inp), [])
+        self.assertFalse(typed_nothing({"emails": ["not an address"]}))
 
 
 if __name__ == "__main__":
